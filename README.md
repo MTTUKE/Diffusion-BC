@@ -16,6 +16,38 @@ Inštalácia potrebných knižníc:
 
     pip install -r requirements.txt
 
+## Rýchly postup spustenia
+
+1. Nainštalovať potrebné knižnice:
+
+       pip install -r requirements.txt
+
+2. Skontrolovať, že sú dostupné dáta a checkpointy:
+
+       data/193_train/
+       data/193_test/
+       checkpoints/best.pt
+
+3. Ak hlavné dáta nie sú dostupné, je možné ich stiahnuť pomocou skriptu:
+
+       python scripts/download_data.py
+
+4. Spustiť inferenciu:
+
+       python sample.py
+
+5. Spustiť Reiss benchmark pre hlavný model:
+
+       python eval_reiss/run_reiss_pipeline.py --source comparison_29 --ckpt checkpoints/best.pt --work-dir reiss_run --method-name Diffusion-BC --ddim-steps 100 --n-samples 6 --thr 0.68 --tta flip4 --kernel-size 5 --min-area 120 --overwrite
+
+6. Ak je potrebné model znovu natrénovať:
+
+       python train.py --mode old
+
+   Pre doplnkový cleaned experiment:
+
+       python train.py --mode clean
+
 ## Štruktúra projektu
 
     train.py              - trénovanie modelu
@@ -23,7 +55,7 @@ Inštalácia potrebných knižníc:
     config.py             - konfigurácia hlavného experimentu
     config_clean.py       - konfigurácia doplnkového cleaned experimentu
 
-    data/                 - dáta a dátové triedy
+    data/                 - dátové triedy a po doplnení aj dátové množiny
     models/               - U-Net architektúra
     diffusion/            - difúzny proces, DDPM/DDIM samplovanie
     utils/                - metriky, seed, EMA a pomocné funkcie
@@ -36,7 +68,31 @@ Inštalácia potrebných knižníc:
     reiss_run/            - výsledky Reiss benchmarku pre hlavný model
     reiss_run_clean/      - výsledky Reiss benchmarku pre cleaned model
 
-## Dáta
+## Dáta a checkpointy
+
+Veľké dátové súbory, PNG obrázky, checkpointy modelov a výsledky Reiss benchmarku nie sú súčasťou Git repozitára, pretože majú veľký objem.
+
+Pred spustením projektu je potrebné manuálne doplniť tieto priečinky:
+
+    data/193_train/
+    data/193_test/
+    data/cleaned_256/
+    comparison_29/
+    checkpoints/
+    checkpoints_clean/
+
+Hlavné SCSS-Net dáta je možné stiahnuť pomocou skriptu:
+
+    python scripts/download_data.py
+
+Po stiahnutí alebo manuálnom doplnení dát má byť štruktúra projektu:
+
+    data/193_train/
+    data/193_test/
+    data/cleaned_256/
+    comparison_29/
+    checkpoints/best.pt
+    checkpoints_clean/best.pt
 
 Hlavný experiment používa dáta v štýle SCSS-Net:
 
@@ -54,6 +110,14 @@ Pre cleaned experiment musí byť dostupný manifest:
 Reiss benchmark vstupy sú uložené v priečinku:
 
     comparison_29/
+
+Ak checkpointy nie sú dostupné, model je potrebné znovu natrénovať pomocou:
+
+    python train.py --mode old
+
+alebo pre doplnkový cleaned experiment:
+
+    python train.py --mode clean
 
 ## Trénovanie modelu
 
@@ -107,13 +171,13 @@ Finálne nastavenie pre Reiss benchmark:
 
 Spustenie Reiss pipeline pre hlavný model:
 
-    python eval_reiss/run_reiss_pipeline.py --source comparison_29 --ckpt checkpoints/best.pt --work-dir reiss_run --method-name Diffusion-BC --ddim-steps 100 --n-samples 6 --thr 0.68 --tta flip4 --kernel-size 5 --min-area 120
+    python eval_reiss/run_reiss_pipeline.py --source comparison_29 --ckpt checkpoints/best.pt --work-dir reiss_run --method-name Diffusion-BC --ddim-steps 100 --n-samples 6 --thr 0.68 --tta flip4 --kernel-size 5 --min-area 120 --overwrite
 
 Spustenie Reiss pipeline pre cleaned model:
 
-    python eval_reiss/run_reiss_pipeline.py --source comparison_29 --ckpt checkpoints_clean/best.pt --work-dir reiss_run_clean --method-name Diffusion-BC-Clean --ddim-steps 100 --n-samples 6 --thr 0.68 --tta flip4 --kernel-size 5 --min-area 120
+    python eval_reiss/run_reiss_pipeline.py --source comparison_29 --ckpt checkpoints_clean/best.pt --work-dir reiss_run_clean --method-name Diffusion-BC-Clean --ddim-steps 100 --n-samples 6 --thr 0.68 --tta flip4 --kernel-size 5 --min-area 120 --overwrite
 
-Ak výstupný priečinok už existuje, treba ho pred opätovným spustením odstrániť alebo použiť parameter --overwrite, ak ho daný skript podporuje.
+Ak výstupný priečinok už existuje, treba ho pred opätovným spustením odstrániť alebo použiť parameter --overwrite.
 
 ## Kontrola projektu
 
@@ -157,3 +221,9 @@ Reiss benchmark pre cleaned model:
     CH_TPR:  0.4767
     Fil_FPR: 0.0000
     Other:   0
+
+## Poznámka
+
+Model je citlivý na formát vstupných dát. Pre správne výsledky musia byť vstupné snímky predspracované rovnakým spôsobom ako pri trénovaní.
+
+Cleaned experiment nie je hlavná finálna línia práce. Slúži ako doplnkové overenie vplyvu kvality dát, predspracovania a zmeny dátovej distribúcie na správanie modelu.
