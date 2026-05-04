@@ -1,0 +1,42 @@
+# Virtual environments and IDE files
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Large datasets / images
+data/193_train/
+data/193_test/
+data/cleaned_256/
+comparison_29/
+
+# Model checkpoints
+checkpoints/
+checkpoints_clean/
+*.pt
+*.pth
+*.ckpt
+
+# Generated results
+reiss_run/
+reiss_run_clean/
+test_reiss_main/
+test_reiss_clean/
+tmp_reiss_dataset/
+runs/
+runs_clean/
+outputs/
+final_outputs/
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# OS files
+.DS_Store
+Thumbs.db
